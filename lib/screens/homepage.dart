@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/screens/availablity.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -458,10 +459,7 @@ class _HomeState extends State<Home> {
                               ),
                               const Text(
                                 'per week',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey
-                                ),
+                                style: TextStyle(fontSize: 14, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -469,56 +467,64 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding:
-                    const EdgeInsets.only(top: 15, left: 15, right: 15),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.blueGrey.shade800,
-                          borderRadius:
-                          const BorderRadius.all(Radius.circular(15))),
-                      padding: const EdgeInsets.all(20),
-                      height: 100,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Text(
-                                'Available cars',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.white,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Availability()));
+                    },
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 15, left: 15, right: 15),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.blueGrey.shade800,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(15))),
+                        padding: const EdgeInsets.all(20),
+                        height: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'Available cars',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                'Long term and short term',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.grey,
+                                Text(
+                                  'Long term and short term',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
                                 ),
+                              ],
+                            ),
+                            Container(
+                              height: 50,
+                              width: 50,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                color: Colors.white,
                               ),
-                            ],
-                          ),
-                          Container(
-                            height: 50,
-                            width: 50,
-                            decoration: const BoxDecoration(
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(15)),
-                              color: Colors.white,
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 24,
-                              color: Colors.blueGrey.shade800,
-                            ),
-                          )
-                        ],
+                              child: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 24,
+                                color: Colors.blueGrey.shade800,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
