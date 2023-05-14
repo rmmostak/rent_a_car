@@ -1,4 +1,5 @@
 import 'package:rent_a_car/screens/homepage.dart';
+import 'package:rent_a_car/screens/login.dart';
 import 'package:rent_a_car/screens/notification.dart';
 
 import 'screens/history.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: GoogleFonts.mulishTextTheme(),
       ),
-      home: MyHomePage(),
+      home: Login(),
     );
   }
 }
