@@ -1,14 +1,20 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rent_a_car/screens/homepage.dart';
 import 'package:rent_a_car/screens/login.dart';
 import 'package:rent_a_car/screens/notification.dart';
 
+import 'firebase_options.dart';
 import 'screens/history.dart';
 import 'screens/profile.dart';
 
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -19,7 +25,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rent A Car',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
@@ -32,7 +37,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({super.key, required User user});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -79,21 +84,29 @@ class _MyHomePageState extends State<MyHomePage> {
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(Icons.home, color: Colors.blueGrey,),
-              label: 'Home'
-            ),
+                icon: Icon(
+                  Icons.home,
+                  color: Colors.blueGrey,
+                ),
+                label: 'Home'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications, color: Colors.blueGrey,),
-              label: 'Notification'
-            ),
+                icon: Icon(
+                  Icons.notifications,
+                  color: Colors.blueGrey,
+                ),
+                label: 'Notification'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.history, color: Colors.blueGrey,),
-              label: 'History'
-            ),
+                icon: Icon(
+                  Icons.history,
+                  color: Colors.blueGrey,
+                ),
+                label: 'History'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person, color: Colors.blueGrey,),
-              label: 'Profile'
-            ),
+                icon: Icon(
+                  Icons.person,
+                  color: Colors.blueGrey,
+                ),
+                label: 'Profile'),
           ],
           currentIndex: _selectedIndex,
           backgroundColor: Colors.blueGrey.shade100,
