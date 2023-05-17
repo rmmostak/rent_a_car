@@ -1,9 +1,13 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rent_a_car/screens/profiles.dart';
 
 import '../main.dart';
 
@@ -55,14 +59,33 @@ class AuthController extends GetxController {
     User? user = result.user;
     if (user != null) {
       print('${user.uid} \t ${user.phoneNumber}');
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MyHomePage(
-                user: user,
-              )));
+      findRoute(context);
     } else {
       print("Error");
+    }
+  }
+
+  findRoute(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((value) => {
+                if (value.exists)
+                  {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MyHomePage())),
+                  }
+                else
+                  {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Profiles())),
+                  }
+              });
     }
   }
 }

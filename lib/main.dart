@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rent_a_car/controllers/AuthController.dart';
 import 'package:rent_a_car/screens/homepage.dart';
 import 'package:rent_a_car/screens/login.dart';
 import 'package:rent_a_car/screens/notification.dart';
+import 'package:rent_a_car/screens/profiles.dart';
 
 import 'firebase_options.dart';
 import 'screens/history.dart';
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -37,7 +40,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required User user});
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();

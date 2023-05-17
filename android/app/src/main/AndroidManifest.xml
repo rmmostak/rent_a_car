@@ -2,6 +2,8 @@
     package="com.rmproduct.rent_a_car">
    <application
         android:label="rent_a_car"
+       android:requestLegacyExternalStorage="true"
+       android:usesCleartextTraffic="true"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

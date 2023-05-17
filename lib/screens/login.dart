@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:rent_a_car/screens/verify_otp.dart';
 import 'package:rent_a_car/widgets/top_screen.dart';
 
+import '../controllers/AuthController.dart';
+
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
@@ -13,11 +15,13 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController txtPhone = TextEditingController();
+  AuthController controller = AuthController();
+
 
   @override
   void initState() {
     super.initState();
-
+    controller.findRoute(context);
     txtPhone.text = '+880';
   }
 
