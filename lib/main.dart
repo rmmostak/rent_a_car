@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+        /*appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           brightness: Brightness.light,
@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             )
           ],
-        ),
+        ),*/
         body: pages[_selectedIndex],
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[

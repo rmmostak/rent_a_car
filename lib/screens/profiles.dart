@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as Path;
 import 'package:rent_a_car/widgets/top_screen.dart';
 
 import '../main.dart';
@@ -22,7 +23,6 @@ class _ProfilesState extends State<Profiles> {
   TextEditingController nameControl = TextEditingController();
   TextEditingController addressControl = TextEditingController();
   TextEditingController nidControl = TextEditingController();
-  TextEditingController picControl = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
@@ -38,7 +38,7 @@ class _ProfilesState extends State<Profiles> {
 
   Future<String> uploadPic(File image) async {
     String imgUrl = '';
-    var fileName = File(image.path);
+    var fileName = Path.basename(image.path);
     User? user = FirebaseAuth.instance.currentUser;
     var reference =
         FirebaseStorage.instance.ref().child('users/${user?.uid}/$fileName');
@@ -46,24 +46,24 @@ class _ProfilesState extends State<Profiles> {
     TaskSnapshot snapshot = await task.whenComplete(() => null);
     await snapshot.ref.getDownloadURL().then((value) => {
           imgUrl = value,
-          log('ImageUrl: $imgUrl'),
         });
 
     return imgUrl;
   }
 
-  saveUser() {
+  saveUser() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    String imgUrl='';
-    Future.delayed(Duration.zero, () async {
+    String imgUrl = '';
+    if (selectedImage != null) {
       imgUrl = await uploadPic(selectedImage!);
-    });
-    FirebaseFirestore.instance.collection('users').doc(uid).set({
+    }
+    FirebaseFirestore fireStore = FirebaseFirestore.instance;
+    fireStore.collection('users').doc(uid).set({
       'uid': uid,
       'name': nameControl.text,
       'address': addressControl.text,
       'pic': imgUrl,
-      'nid': nidControl,
+      'nid': nidControl.text,
     }).then((value) => {
           nameControl.clear(),
           addressControl.clear(),
@@ -145,10 +145,6 @@ class _ProfilesState extends State<Profiles> {
                       (String? input) {
                     if (input!.isEmpty) {
                       return 'Enter your full name';
-                    }
-
-                    if (input.length < 5) {
-                      return 'Please enter a valid name!';
                     }
                     return null;
                   }),
