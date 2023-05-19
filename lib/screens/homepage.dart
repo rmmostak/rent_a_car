@@ -15,6 +15,9 @@ class _HomeState extends State<Home> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        const SizedBox(
+          height: 30,
+        ),
         Container(
           padding: const EdgeInsets.only(bottom: 10),
           child: Padding(
