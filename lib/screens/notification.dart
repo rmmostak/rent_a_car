@@ -1,11 +1,12 @@
 import 'dart:async';
-
+import 'package:geocoding/geocoding.dart' as geoCoding;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Notifications extends StatefulWidget {
   Notifications({Key? key}) : super(key: key);
@@ -22,17 +23,38 @@ class _NotificationsState extends State<Notifications> {
     target: LatLng(23.7905223, 90.3518688),
     zoom: 14,
   );
-
+  Set<Marker> markers=Set<Marker>();
   String? _mapStyle;
   GoogleMapController? myMapController;
+  late LatLng destination;
+
+  Future<bool> requestPerm() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.location,
+      Permission.locationWhenInUse,
+      Permission.storage
+    ].request();
+
+    if (statuses[Permission.location] != null &&
+        statuses[Permission.bluetooth] != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @override
   void initState() {
+    Future.delayed(Duration.zero, () async {
+      if (!await requestPerm()) {
+        requestPerm();
+      } else {
+        rootBundle.loadString('assets/files/map_style.txt').then((value) => {
+              _mapStyle = value,
+            });
+      }
+    });
     super.initState();
-
-    rootBundle.loadString('assets/files/map_style.txt').then((value) => {
-          _mapStyle = value,
-        });
   }
 
   @override
@@ -47,9 +69,8 @@ class _NotificationsState extends State<Notifications> {
           zoomControlsEnabled: false,
           initialCameraPosition: _kGooglePlex,
           onMapCreated: (GoogleMapController controller) {
+            myMapController = controller;
             myMapController!.setMapStyle(_mapStyle);
-            myMapController:
-            controller;
           },
         ),
       ),
@@ -103,6 +124,11 @@ class _NotificationsState extends State<Notifications> {
     );
   }
 
+  TextEditingController destinationController = TextEditingController();
+  TextEditingController sourceController = TextEditingController();
+
+  bool showSourceField = false;
+
   Widget buildSearch() {
     return Positioned(
       top: 120,
@@ -124,9 +150,29 @@ class _NotificationsState extends State<Notifications> {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         child: TextFormField(
+          controller: destinationController,
           readOnly: true,
-          onTap: () {
-            showAutoComplete();
+          onTap: () async {
+            Prediction? p =
+                await showAutoComplete();
+
+            String selectedPlace = p!.description!;
+
+            destinationController.text = selectedPlace;
+
+            List<geoCoding.Location> locations =
+            await geoCoding.locationFromAddress(selectedPlace);
+
+            destination =
+                LatLng(locations.first.latitude, locations.first.longitude);
+            markers.add(Marker(
+              markerId: MarkerId(selectedPlace),
+              infoWindow: InfoWindow(
+                title: 'Destination: $selectedPlace',
+              ),
+              position: destination,
+              //icon: Icons.location_on,
+            ));
           },
           style: const TextStyle(
             fontSize: 14,
@@ -152,15 +198,24 @@ class _NotificationsState extends State<Notifications> {
     );
   }
 
-  void showAutoComplete() async {
+  Future<Prediction?> showAutoComplete() async {
     const googleMapAPI = '';
 
     Prediction? p = await PlacesAutocomplete.show(
-        context: context,
-        apiKey: googleMapAPI,
-        mode: Mode.overlay,
-        language: 'en',
-        components: [Component(Component.country, 'en')]);
+      offset: 0,
+      radius: 1000,
+      strictbounds: false,
+      region: "bd",
+      language: "en",
+      context: context,
+      mode: Mode.overlay,
+      apiKey: googleMapAPI,
+      components: [new Component(Component.country, "bd")],
+      types: ["(cities)"],
+      hint: "Search City",
+    );
+
+    return p;
   }
 
   Widget buildMyLocation() {
