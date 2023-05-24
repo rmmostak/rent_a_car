@@ -156,23 +156,6 @@ class _NotificationsState extends State<Notifications> {
             Prediction? p =
                 await showAutoComplete();
 
-            String selectedPlace = p!.description!;
-
-            destinationController.text = selectedPlace;
-
-            List<geoCoding.Location> locations =
-            await geoCoding.locationFromAddress(selectedPlace);
-
-            destination =
-                LatLng(locations.first.latitude, locations.first.longitude);
-            markers.add(Marker(
-              markerId: MarkerId(selectedPlace),
-              infoWindow: InfoWindow(
-                title: 'Destination: $selectedPlace',
-              ),
-              position: destination,
-              //icon: Icons.location_on,
-            ));
           },
           style: const TextStyle(
             fontSize: 14,
@@ -199,7 +182,7 @@ class _NotificationsState extends State<Notifications> {
   }
 
   Future<Prediction?> showAutoComplete() async {
-    const googleMapAPI = '';
+    const googleMapAPI = 'AIzaSyAzvyjC2BBggfQL8itXKwLd5kLf_k9AV_w';
 
     Prediction? p = await PlacesAutocomplete.show(
       offset: 0,
@@ -210,7 +193,7 @@ class _NotificationsState extends State<Notifications> {
       context: context,
       mode: Mode.overlay,
       apiKey: googleMapAPI,
-      components: [new Component(Component.country, "bd")],
+      components: [Component(Component.country, "bd")],
       types: ["(cities)"],
       hint: "Search City",
     );

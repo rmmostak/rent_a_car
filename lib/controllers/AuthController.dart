@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:rent_a_car/screens/profiles.dart';
 
 import '../main.dart';
+import '../models/user.dart';
 
 class AuthController extends GetxController {
   String userId = '';
@@ -87,5 +88,19 @@ class AuthController extends GetxController {
                   }
               });
     }
+  }
+
+  var mUser = UserModel().obs;
+
+  void getUserInfo() {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .listen((event) {
+      mUser.value = UserModel.fromJson(event.data()!);
+      print('DataFromBase: ${event.data()}');
+    });
   }
 }
