@@ -1,19 +1,17 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rent_a_car/controllers/AuthController.dart';
 import 'package:rent_a_car/screens/homepage.dart';
 import 'package:rent_a_car/screens/login.dart';
 import 'package:rent_a_car/screens/notification.dart';
-import 'package:rent_a_car/screens/profiles.dart';
+import 'package:rent_a_car/screens/profile.dart';
+import 'package:rent_a_car/screens/search_dest.dart';
 
 import 'firebase_options.dart';
-import 'models/user.dart';
 import 'screens/history.dart';
-import 'screens/profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  List pages = [Home(), Notifications(), History(), Profile()];
+  List pages = [Home(), Notifications(), History()];
 
   @override
   Widget build(BuildContext context) {
@@ -90,11 +88,16 @@ class _MyHomePageState extends State<MyHomePage> {
               Text(
                 'Save and Steady',
                 style: GoogleFonts.mulish(
-                    fontSize: 14,
-                    color: Colors.blueGrey.shade600),
+                    fontSize: 14, color: Colors.blueGrey.shade600),
               ),
             ],
           ),
+          actions: [
+            IconButton(
+                onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SearchDest())),
+                icon: const Icon(Icons.search))
+          ],
           centerTitle: false,
         ),
         body: pages[_selectedIndex],
@@ -106,26 +109,110 @@ class _MyHomePageState extends State<MyHomePage> {
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Colors.blueGrey,
                 ),
-                child: Text('Drawer Header'),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: Obx(() => authController.mUser.value.name != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  image: authController.mUser.value.pic == null
+                                      ? const DecorationImage(
+                                          image: AssetImage(
+                                              'assets/images/bmw2.png'),
+                                          fit: BoxFit.fill)
+                                      : DecorationImage(
+                                          image: NetworkImage(
+                                              authController.mUser.value.pic!),
+                                          fit: BoxFit.fill)),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              authController.mUser.value.name.toString(),
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white),
+                            ),
+                            Text(
+                              authController.mUser.value.phone.toString(),
+                              textAlign: TextAlign.left,
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                          ],
+                        )
+                      : const Text('You are not logged in...')),
+                ),
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.home,
                 ),
-                title: const Text('Page 1'),
+                title: const Text('Dashboard'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MyHomePage()));
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.account_circle,
+                ),
+                title: const Text('Profile'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const Profile()));
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.app_blocking_outlined,
+                ),
+                title: const Text('About'),
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
               ListTile(
-                leading: Icon(
-                  Icons.train,
+                leading: const Icon(
+                  Icons.policy,
                 ),
-                title: const Text('Page 2'),
+                title: const Text('Policy'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.share,
+                ),
+                title: const Text('Share'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.logout,
+                ),
+                title: const Text('Logout'),
                 onTap: () {
                   Navigator.pop(context);
                 },
@@ -153,12 +240,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blueGrey,
                 ),
                 label: 'History'),
-            BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.person,
-                  color: Colors.blueGrey,
-                ),
-                label: 'Profile'),
           ],
           currentIndex: _selectedIndex,
           backgroundColor: Colors.blueGrey.shade100,

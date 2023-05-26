@@ -1,11 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
-import '../models/user.dart';
+import 'availablity.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -15,300 +10,692 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var mUser = UserModel().obs;
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController fromAddressController = TextEditingController();
-  TextEditingController toAddressController = TextEditingController();
-  TextEditingController seatNumController = TextEditingController();
-  TextEditingController carController = TextEditingController();
-  TextEditingController fromDateController = TextEditingController();
-  TextEditingController toDateController = TextEditingController();
-  TextEditingController fareController = TextEditingController();
-
-  // Initial Selected Value
-  String dropdownValue = 'Choose Car';
-
-  // List of items in our dropdown menu
-  var items = [
-    'Item 1',
-    'Item 2',
-    'Item 3',
-    'Item 4',
-    'Item 5',
-  ];
-
-  List<DropdownMenuItem<String>> get dropdownItems{
-    List<DropdownMenuItem<String>> menuItems = [
-      DropdownMenuItem(child: Text("USA"),value: "USA"),
-      DropdownMenuItem(child: Text("Canada"),value: "Canada"),
-      DropdownMenuItem(child: Text("Brazil"),value: "Brazil"),
-      DropdownMenuItem(child: Text("England"),value: "England"),
-    ];
-    return menuItems;
-  }
-
-  void getUserInfo() {
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .snapshots()
-        .listen((event) {
-      mUser.value = UserModel.fromJson(event.data()!);
-      print('DataFromBase: ${event.data()}');
-    });
-  }
-
-  @override
-  void initState() {
-    removePreviousValue();
-    getUserInfo();
-    super.initState();
-  }
-
-  void removePreviousValue() {
-    fromAddressController.text = '';
-    toAddressController.text = '';
-    seatNumController.text = '';
-    carController.text = '';
-    fromDateController.text = '';
-    toDateController.text = '';
-    fareController.text = '';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.all(20),
-        child: Expanded(
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  )),
+              child: Column(
                 children: [
-                  const Expanded(
-                      flex: 3,
-                      child: Text(
-                        'From',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'TOP DEALS',
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey.shade800),
                         ),
-                      )),
-                  Expanded(
-                      flex: 8,
-                      child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          textCapitalization: TextCapitalization.sentences,
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.all(5),
-                              hintText: 'From address',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.blueGrey,
-                                width: 0.05,
-                                style: BorderStyle.solid,
-                              ))))),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                      flex: 3,
-                      child: Text(
-                        'To',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                //print('Click to ${_key.currentState}');
+                              },
+                              child: Text(
+                                'View all',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueGrey.shade800),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 12,
+                            )
+                          ],
                         ),
-                      )),
-                  Expanded(
-                      flex: 8,
-                      child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          textCapitalization: TextCapitalization.sentences,
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.all(5),
-                              hintText: 'Destination address',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.blueGrey,
-                                width: 0.05,
-                                style: BorderStyle.solid,
-                              ))))),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                      flex: 3,
-                      child: Text(
-                        'Seat',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                  Expanded(
-                      flex: 8,
-                      child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          textCapitalization: TextCapitalization.sentences,
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.all(5),
-                              hintText: 'Desired seat',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.blueGrey,
-                                width: 0.05,
-                                style: BorderStyle.solid,
-                              ))))),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                      flex: 3,
-                      child: Text(
-                        'Car',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )),
-                  Expanded(
-                    flex: 8,
-                    child: DropdownButtonFormField(
-                      value: dropdownValue,
-                      decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.all(5),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                            color: Colors.blueGrey,
-                            width: 0.05,
-                            style: BorderStyle.solid,
-                          ))),
-                      // Down Arrow Icon
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      items: items.map((String item) {
-                        return DropdownMenuItem(
-                          value: item,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Text(item),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() async {
-                          dropdownValue = newValue!;
-                        });
-                      },
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                      flex: 3,
-                      child: Text(
-                        'Journey',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  Container(
+                    height: 280,
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: const EdgeInsets.all(15),
+                          margin: const EdgeInsets.only(left: 15, right: 15),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey.shade800,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    child: Text(
+                                      'Condition',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Container(
+                                height: 120,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(
+                                'Model',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              const Text(
+                                'Brand',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                'per week',
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
                         ),
-                      )),
-                  Expanded(
-                      flex: 4,
-                      child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: fromDateController,
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1950),
-                                lastDate: DateTime(2100));
-
-                            if (pickedDate != null) {
-                              String formattedDate =
-                                  DateFormat('dd MMM yyyy').format(pickedDate);
-                              setState(() {
-                                fromDateController.text = formattedDate;
-                              });
-                            }
-                          },
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.all(5),
-                              hintText: 'From',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.blueGrey,
-                                width: 0.05,
-                                style: BorderStyle.solid,
-                              ))))),
-                  const Spacer(
-                    flex: 1,
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: const EdgeInsets.all(15),
+                          margin: const EdgeInsets.only(left: 15, right: 15),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey.shade800,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    child: Text(
+                                      'Condition',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Container(
+                                height: 120,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(
+                                'Model',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              const Text(
+                                'Brand',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                'per week',
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: EdgeInsets.all(15),
+                          margin: EdgeInsets.only(left: 15, right: 15),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey.shade800,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    child: Text(
+                                      'Condition',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Container(
+                                height: 120,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(
+                                'Model',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              const Text(
+                                'Brand',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                'per week',
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: EdgeInsets.all(15),
+                          margin: EdgeInsets.only(left: 15, right: 15),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey.shade800,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    child: Text(
+                                      'Condition',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Container(
+                                height: 120,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(
+                                'Model',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              const Text(
+                                'Brand',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                'per week',
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: EdgeInsets.all(15),
+                          margin: EdgeInsets.only(left: 15, right: 15),
+                          width: 200,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blueGrey.shade800,
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    child: Text(
+                                      'Condition',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Container(
+                                height: 120,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              const Text(
+                                'Model',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              const Text(
+                                'Brand',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                'per week',
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Expanded(
-                      flex: 4,
-                      child: TextFormField(
-                          controller: toDateController,
-                          keyboardType: TextInputType.number,
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1950),
-                                lastDate: DateTime(2100));
-
-                            if (pickedDate != null) {
-                              String formattedDate =
-                                  DateFormat('dd MMM yyyy').format(pickedDate);
-                              setState(() {
-                                toDateController.text = formattedDate;
-                              });
-                            }
-                          },
-                          decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 0),
-                              hintText: 'To',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.blueGrey,
-                                width: 0.05,
-                                style: BorderStyle.solid,
-                              ))))),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Availability()));
+                    },
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 15, left: 15, right: 15),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.blueGrey.shade800,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(15))),
+                        padding: const EdgeInsets.all(20),
+                        height: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'Available cars',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  'Long term and short term',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              height: 50,
+                              width: 50,
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 24,
+                                color: Colors.blueGrey.shade800,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'TOP DEALERS',
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey.shade800),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'View all',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueGrey.shade800),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 12,
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 180,
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(left: 15, right: 15),
+                          width: 150,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 100,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text(
+                                'Brand',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                '142 offers',
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(left: 15, right: 15),
+                          width: 150,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 100,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text(
+                                'Brand',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                '142 offers',
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(left: 15, right: 15),
+                          width: 150,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 100,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text(
+                                'Brand',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                '142 offers',
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.only(left: 15, right: 15),
+                          width: 150,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 100,
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/bmw.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              const Text(
+                                'Brand',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1),
+                              ),
+                              const Text(
+                                '142 offers',
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                 ],
               ),
             ),
-          ]),
-        ));
+          ),
+        ),
+      ],
+    );
   }
 }

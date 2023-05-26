@@ -100,7 +100,6 @@ class AuthController extends GetxController {
         .snapshots()
         .listen((event) {
       mUser.value = UserModel.fromJson(event.data()!);
-      print('DataFromBase: ${event.data()}');
     });
   }
 }
