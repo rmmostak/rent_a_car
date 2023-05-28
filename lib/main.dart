@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rent_a_car/admin/admin_home.dart';
 import 'package:rent_a_car/controllers/AuthController.dart';
 import 'package:rent_a_car/screens/homepage.dart';
 import 'package:rent_a_car/screens/login.dart';
@@ -157,6 +157,20 @@ class _MyHomePageState extends State<MyHomePage> {
                       : const Text('You are not logged in...')),
                 ),
               ),
+              authController.mUser.value.role == 5
+                  ? ListTile(
+                      leading: const Icon(
+                        Icons.admin_panel_settings,
+                      ),
+                      title: const Text('Admin Area'),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AdminHome()));
+                      },
+                    )
+                  : Container(),
               ListTile(
                 leading: const Icon(
                   Icons.home,
@@ -175,10 +189,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 title: const Text('Profile'),
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const Profile()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const Profile()));
                 },
               ),
               ListTile(
@@ -248,179 +260,5 @@ class _MyHomePageState extends State<MyHomePage> {
               const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           onTap: _onItemTapped,
         ));
-  }
-
-  buildDrawerItem(
-      {required String title,
-      required Function onPressed,
-      Color color = Colors.black,
-      double fontSize = 20,
-      FontWeight fontWeight = FontWeight.w700,
-      double height = 45,
-      bool isVisible = false}) {
-    return SizedBox(
-      height: height,
-      child: ListTile(
-        contentPadding: EdgeInsets.all(0),
-        // minVerticalPadding: 0,
-        dense: true,
-        onTap: () => onPressed(),
-        title: Row(
-          children: [
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                  fontSize: fontSize, fontWeight: fontWeight, color: color),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            isVisible
-                ? CircleAvatar(
-                    backgroundColor: Colors.blueGrey,
-                    radius: 15,
-                    child: Text(
-                      '1',
-                      style: GoogleFonts.poppins(color: Colors.white),
-                    ),
-                  )
-                : Container()
-          ],
-        ),
-      ),
-    );
-  }
-
-  buildDrawer() {
-    return Drawer(
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () {
-              //Get.to(() => const MyProfile());
-            },
-            child: SizedBox(
-              height: 150,
-              child: DrawerHeader(
-                  child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: authController.mUser.value.pic == null
-                            ? const DecorationImage(
-                                image: AssetImage('assets/person.png'),
-                                fit: BoxFit.fill)
-                            : DecorationImage(
-                                image: NetworkImage(
-                                    authController.mUser.value.pic!),
-                                fit: BoxFit.fill)),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Good Morning, ',
-                            style: GoogleFonts.poppins(
-                                color: Colors.black.withOpacity(0.28),
-                                fontSize: 14)),
-                        Text(
-                          authController.mUser.value.name == null
-                              ? "Mark"
-                              : authController.mUser.value.name!,
-                          style: GoogleFonts.poppins(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              )),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              children: [
-                buildDrawerItem(
-                    title: 'Payment History',
-                    onPressed: () {}
-                ),
-                buildDrawerItem(
-                    title: 'Ride History', onPressed: () {}, isVisible: true),
-                buildDrawerItem(title: 'Invite Friends', onPressed: () {}),
-                buildDrawerItem(title: 'Promo Codes', onPressed: () {}),
-                buildDrawerItem(title: 'Settings', onPressed: () {}),
-                buildDrawerItem(title: 'Support', onPressed: () {}),
-                buildDrawerItem(
-                    title: 'Log Out',
-                    onPressed: () {
-                      FirebaseAuth.instance.signOut();
-                    }),
-              ],
-            ),
-          ),
-          const Spacer(),
-          const Divider(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-            child: Column(
-              children: [
-                buildDrawerItem(
-                    title: 'Do more',
-                    onPressed: () {},
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.15),
-                    height: 20),
-                const SizedBox(
-                  height: 20,
-                ),
-                buildDrawerItem(
-                    title: 'Get food delivery',
-                    onPressed: () {},
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black.withOpacity(0.15),
-                    height: 20),
-                buildDrawerItem(
-                    title: 'Make money driving',
-                    onPressed: () {},
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black.withOpacity(0.15),
-                    height: 20),
-                buildDrawerItem(
-                  title: 'Rate us on store',
-                  onPressed: () {},
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black.withOpacity(0.15),
-                  height: 20,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-        ],
-      ),
-    );
   }
 }

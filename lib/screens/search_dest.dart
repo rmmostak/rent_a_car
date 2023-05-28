@@ -29,6 +29,8 @@ class _SearchDestState extends State<SearchDest> {
   GoogleMapController? myMapController;
   late LatLng destination;
 
+  final globalKey = GlobalKey<ScaffoldState>();
+
   Future<bool> requestPerm() async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.location,
@@ -68,6 +70,7 @@ class _SearchDestState extends State<SearchDest> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: globalKey,
       body: Stack(children: [
         Positioned(
           top: 25,
@@ -196,16 +199,16 @@ class _SearchDestState extends State<SearchDest> {
     const googleMapAPI = 'AIzaSyAzvyjC2BBggfQL8itXKwLd5kLf_k9AV_w';
 
     Prediction? p = await PlacesAutocomplete.show(
-      offset: 0,
-      radius: 1000,
-      strictbounds: false,
-      region: "bd",
-      language: "en",
       context: context,
-      mode: Mode.overlay,
       apiKey: googleMapAPI,
+      mode: Mode.overlay,
+      language: "en",
+      onError: (PlacesAutocompleteResponse response) {
+        globalKey.currentState!.showBottomSheet((context) => Text(response.errorMessage!));
+      },
+      strictbounds: false,
+      types: [""],
       components: [Component(Component.country, "bd")],
-      types: ["(cities)"],
       hint: "Search City",
     );
 
