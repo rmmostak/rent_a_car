@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               authController.mUser.value.phone.toString(),
                               textAlign: TextAlign.left,
                               style:
-                                  TextStyle(fontSize: 14, color: Colors.white),
+                                  const TextStyle(fontSize: 14, color: Colors.white),
                             ),
                           ],
                         )
@@ -171,18 +171,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       },
                     )
                   : Container(),
-              ListTile(
-                leading: const Icon(
-                  Icons.home,
-                ),
-                title: const Text('Dashboard'),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MyHomePage()));
-                },
-              ),
               ListTile(
                 leading: const Icon(
                   Icons.account_circle,
