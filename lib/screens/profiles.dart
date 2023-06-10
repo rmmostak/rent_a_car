@@ -65,6 +65,7 @@ class _ProfilesState extends State<Profiles> {
       'address': addressControl.text,
       'pic': imgUrl,
       'nid': nidControl.text,
+      'phone': FirebaseAuth.instance.currentUser!.phoneNumber
     }).then((value) => {
           nameControl.clear(),
           addressControl.clear(),

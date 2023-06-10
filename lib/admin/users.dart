@@ -1,17 +1,219 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:pinput/pinput.dart';
+
+import '../controllers/AuthController.dart';
 
 class Users extends StatefulWidget {
-  const Users({Key? key}) : super(key: key);
-
   @override
   State<Users> createState() => _UsersState();
 }
 
 class _UsersState extends State<Users> {
+  User? user;
+  AuthController controller = Get.put(AuthController());
+
+  GlobalKey<FormState> dialogKey = GlobalKey<FormState>();
+  TextEditingController txtOTP = TextEditingController();
+
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController nidControl = TextEditingController();
   TextEditingController nameControl = TextEditingController();
   TextEditingController phoneControl = TextEditingController();
+  TextEditingController addressControl = TextEditingController();
+
+  verifyPhoneSheet(BuildContext context) {
+    return showModalBottomSheet<void>(
+        isScrollControlled: true,
+        isDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              color: Colors.white30,
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: dialogKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: const Text(
+                            'Verify phone number',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Pinput(
+                          length: 6,
+                          controller: txtOTP,
+                          onCompleted: (otp) {
+                            //controller.verifyOTP(context, otp);
+                          },
+                          defaultPinTheme: PinTheme(
+                            width: 50,
+                            height: 50,
+                            textStyle: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.bold),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.blueGrey.shade300),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          showCursor: true,
+                          pinputAutovalidateMode:
+                              PinputAutovalidateMode.onSubmit,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.all(5),
+                          child: ElevatedButton(
+                            child: const Text(
+                              'Verify',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                Future.delayed(Duration.zero, () async {
+                                  user = await controller.verifyAdminOtp(
+                                      context, txtOTP.text);
+                                  if (user != null) {
+                                    inputInfoSheet(context);
+                                  } else {
+                                    print('Something went wrong!');
+                                  }
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          );
+        });
+  }
+
+  inputInfoSheet(BuildContext context) {
+    return showModalBottomSheet<void>(
+        context: context,
+        isDismissible: false,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.5,
+              color: Colors.white30,
+              child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: const Text(
+                            'Add New User',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        inputWidget(
+                            context, 'Name', Icons.account_box, nameControl,
+                            (String? input) {
+                          if (input!.isEmpty) {
+                            return 'Please enter user\'s name';
+                          }
+                          return null;
+                        }),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        inputWidget(context, 'Address', Icons.account_box,
+                            addressControl, (String? input) {
+                          if (input!.isEmpty) {
+                            return 'Please enter user\'s address';
+                          }
+                          return null;
+                        }),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        inputWidget(context, 'NID', Icons.credit_card_rounded,
+                            nidControl, (String? input) {
+                          if (input!.isEmpty) {
+                            return 'Please enter user\'s NID';
+                          }
+                          return null;
+                        }),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.all(5),
+                          child: ElevatedButton(
+                            child: const Text(
+                              'Add New User',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                controller.userInfoSetupAdmin(
+                                    context,
+                                    user!,
+                                    nameControl.text,
+                                    addressControl.text,
+                                    nidControl.text,
+                                    '1');
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          );
+        });
+  }
+
+  @override
+  void initState() {
+    phoneControl.text = '+880';
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,77 +271,77 @@ class _UsersState extends State<Users> {
         onPressed: () {
           showModalBottomSheet<void>(
               context: context,
+              isScrollControlled: true,
               builder: (BuildContext context) {
-                return Container(
-                  height: MediaQuery.of(context).size.height * 0.8,
-                  color: Colors.white30,
+                return Padding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Container(
-                      padding: const EdgeInsets.all(20),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: const Text(
-                                'Add New User',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    color: Colors.white30,
+                    child: Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: const Text(
+                                  'Add New User',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            inputWidget(
-                                context, 'Name', Icons.account_box, nameControl,
-                                (String? input) {
-                              if (input!.isEmpty) {
-                                return 'Please enter user\'s name';
-                              }
-                              return null;
-                            }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            inputWidget(
-                                context, 'Phone', Icons.phone, phoneControl,
-                                (String? input) {
-                              if (input!.isEmpty) {
-                                return 'Please enter user\'s phone';
-                              }
-                              return null;
-                            }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            inputWidget(
-                                context,
-                                'NID',
-                                Icons.credit_card_rounded,
-                                nidControl, (String? input) {
-                              if (input!.isEmpty) {
-                                return 'Please enter user\'s NID';
-                              }
-                              return null;
-                            }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ElevatedButton(
-                              child: const Text('Create New User'),
-                              onPressed: () {
-                                if (formKey.currentState!.validate()) {
-                                  print('some object');
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      )),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              TextFormField(
+                                  keyboardType: TextInputType.phone,
+                                  controller: phoneControl,
+                                  validator: (val) => val!.isEmpty
+                                      ? 'Please enter your phone number'
+                                      : (val.length == 14)
+                                          ? null
+                                          : 'Please provide number with country code',
+                                  decoration: const InputDecoration(
+                                      labelText: 'Phone',
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.green,
+                                        width: 1,
+                                        style: BorderStyle.solid,
+                                      )))),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                padding: EdgeInsets.all(5),
+                                child: ElevatedButton(
+                                  child: const Text(
+                                    'Get Verification Code',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  onPressed: () {
+                                    if (formKey.currentState!.validate()) {
+                                      controller.authByPhone(phoneControl.text);
+                                      verifyPhoneSheet(context);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ),
                 );
               });
         },

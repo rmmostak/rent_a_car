@@ -127,13 +127,16 @@ class _CarsState extends State<Cars> {
                             const SizedBox(
                               height: 10,
                             ),
-                            ElevatedButton(
-                              child: const Text('Add New Car'),
-                              onPressed: () {
-                                if (formKey.currentState!.validate()) {
-                                  print('some object');
-                                }
-                              },
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: ElevatedButton(
+                                child: const Text('Add New Car'),
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    print('some object');
+                                  }
+                                },
+                              ),
                             ),
                           ],
                         ),

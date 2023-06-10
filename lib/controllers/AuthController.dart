@@ -1,14 +1,13 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rent_a_car/screens/profiles.dart';
 
+import '../admin/admin_home.dart';
 import '../main.dart';
 import '../models/user.dart';
 
@@ -50,12 +49,38 @@ class AuthController extends GetxController {
     }
   }
 
-  verifyOTP(BuildContext context, String otp) async {
-    AuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verId, smsCode: otp);
+  Future<User?> verifyAdminOtp(BuildContext context, String otp) async {
+    AuthCredential credential =
+        PhoneAuthProvider.credential(verificationId: verId, smsCode: otp);
 
-    UserCredential result =
-    await auth.signInWithCredential(credential);
+    UserCredential result = await auth.signInWithCredential(credential);
+
+    User? user = result.user;
+    return user;
+  }
+
+  userInfoSetupAdmin(BuildContext context, User user, String name,
+      String address, String nid, String role) {
+    FirebaseFirestore fireStore = FirebaseFirestore.instance;
+    fireStore.collection('users').doc(user.uid).set({
+      'uid': user.uid,
+      'name': name,
+      'address': address,
+      'pic': '',
+      'nid': nid,
+      'phone': user.phoneNumber,
+      'role': role
+    }).then((value) => {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AdminHome())),
+        });
+  }
+
+  verifyOTP(BuildContext context, String otp) async {
+    AuthCredential credential =
+        PhoneAuthProvider.credential(verificationId: verId, smsCode: otp);
+
+    UserCredential result = await auth.signInWithCredential(credential);
 
     User? user = result.user;
     if (user != null) {

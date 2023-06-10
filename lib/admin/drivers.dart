@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pinput/pinput.dart';
 
 class Drivers extends StatefulWidget {
   const Drivers({Key? key}) : super(key: key);
@@ -8,11 +9,97 @@ class Drivers extends StatefulWidget {
 }
 
 class _DriversState extends State<Drivers> {
+  GlobalKey<FormState> dialogKey = GlobalKey<FormState>();
+  TextEditingController txtOTP = TextEditingController();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController nidControl = TextEditingController();
   TextEditingController nameControl = TextEditingController();
   TextEditingController phoneControl = TextEditingController();
+
+  showBottomSheet(BuildContext context) {
+    return showModalBottomSheet<void>(
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext context) {
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              color: Colors.white30,
+              height: 230,
+              child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: dialogKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: const Text(
+                            'Verify phone number',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Pinput(
+                          length: 6,
+                          controller: txtOTP,
+                          onCompleted: (otp) {
+                            //controller.verifyOTP(context, otp);
+                          },
+                          defaultPinTheme: PinTheme(
+                            width: 50,
+                            height: 50,
+                            textStyle: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.blueGrey,
+                                fontWeight: FontWeight.bold),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.blueGrey.shade300),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          showCursor: true,
+                          pinputAutovalidateMode:
+                              PinputAutovalidateMode.onSubmit,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.all(5),
+                          child: ElevatedButton(
+                            child: const Text(
+                              'Verify',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                print('some object');
+                              } else {
+                                print('some object not comply');
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,10 +157,14 @@ class _DriversState extends State<Drivers> {
         onPressed: () {
           showModalBottomSheet<void>(
               context: context,
+              isScrollControlled: true,
               builder: (BuildContext context) {
-                return Container(
-                  color: Colors.white30,
+                return Padding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                      color: Colors.white30,
                       padding: const EdgeInsets.all(20),
                       child: Form(
                         key: formKey,
@@ -96,28 +187,30 @@ class _DriversState extends State<Drivers> {
                             ),
                             inputWidget(
                                 context, 'Name', Icons.account_box, nameControl,
-                                    (String? input) {
-                                  if (input!.isEmpty) {
-                                    return 'Please enter user\'s name';
-                                  }
-                                  return null;
-                                }),
+                                (String? input) {
+                              if (input!.isEmpty) {
+                                return 'Please enter user\'s name';
+                              }
+                              return null;
+                            }),
                             const SizedBox(
                               height: 10,
                             ),
                             inputWidget(
                                 context, 'Phone', Icons.phone, phoneControl,
-                                    (String? input) {
-                                  if (input!.isEmpty) {
-                                    return 'Please enter user\'s phone';
-                                  }
-                                  return null;
-                                }),
+                                (String? input) {
+                              if (input!.isEmpty) {
+                                return 'Please enter user\'s phone';
+                              }
+                              return null;
+                            }),
                             const SizedBox(
                               height: 10,
                             ),
                             inputWidget(
-                                context, 'NID', Icons.credit_card_rounded,
+                                context,
+                                'NID',
+                                Icons.credit_card_rounded,
                                 nidControl, (String? input) {
                               if (input!.isEmpty) {
                                 return 'Please enter user\'s NID';
@@ -127,18 +220,23 @@ class _DriversState extends State<Drivers> {
                             const SizedBox(
                               height: 10,
                             ),
-                            ElevatedButton(
-                              child: const Text('Add New Driver'),
-                              onPressed: () {
-                                if (formKey.currentState!.validate()) {
-                                  print('some object');
-                                }
-                              },
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: ElevatedButton(
+                                child: const Text('Add New Driver'),
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    print('some object');
+                                    showBottomSheet(context);
+                                  } else {
+                                    showBottomSheet(context);
+                                  }
+                                },
+                              ),
                             ),
                           ],
                         ),
-                      )
-                  ),
+                      )),
                 );
               });
         },
