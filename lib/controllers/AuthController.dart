@@ -84,10 +84,10 @@ class AuthController extends GetxController {
 
     User? user = result.user;
     if (user != null) {
-      print('${user.uid} \t ${user.phoneNumber}');
+      /*Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MyHomePage()));*/
       findRoute(context);
     } else {
-      print("Error");
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -27,8 +28,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -53,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
 
   AuthController authController = AuthController();
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -117,59 +117,59 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.all(10),
                   child: Obx(() => authController.mUser.value.name != null
                       ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                  color: Colors.white,
-                                  image: authController.mUser.value.pic == null
-                                      ? const DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/bmw2.png'),
-                                          fit: BoxFit.fill)
-                                      : DecorationImage(
-                                          image: NetworkImage(
-                                              authController.mUser.value.pic!),
-                                          fit: BoxFit.fill)),
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Text(
-                              authController.mUser.value.name.toString(),
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                              authController.mUser.value.phone.toString(),
-                              textAlign: TextAlign.left,
-                              style:
-                                  const TextStyle(fontSize: 14, color: Colors.white),
-                            ),
-                          ],
-                        )
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            image: authController.mUser.value.pic == null
+                                ? const DecorationImage(
+                                image: AssetImage(
+                                    'assets/images/bmw2.png'),
+                                fit: BoxFit.fill)
+                                : DecorationImage(
+                                image: NetworkImage(
+                                    authController.mUser.value.pic!),
+                                fit: BoxFit.fill)),
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Text(
+                        authController.mUser.value.name.toString(),
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white),
+                      ),
+                      Text(
+                        authController.mUser.value.phone.toString(),
+                        textAlign: TextAlign.left,
+                        style:
+                        const TextStyle(fontSize: 14, color: Colors.white),
+                      ),
+                    ],
+                  )
                       : const Text('You are not logged in...')),
                 ),
               ),
               authController.mUser.value.role == 5
                   ? ListTile(
-                      leading: const Icon(
-                        Icons.admin_panel_settings,
-                      ),
-                      title: const Text('Admin Area'),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AdminHome()));
-                      },
-                    )
+                leading: const Icon(
+                  Icons.admin_panel_settings,
+                ),
+                title: const Text('Admin Area'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AdminHome()));
+                },
+              )
                   : Container(),
               ListTile(
                 leading: const Icon(
@@ -214,7 +214,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 title: const Text('Logout'),
                 onTap: () {
-                  Navigator.pop(context);
+                  auth.signOut();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login()));
                 },
               ),
             ],
@@ -245,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.blueGrey.shade100,
           selectedItemColor: Colors.blueGrey.shade900,
           selectedLabelStyle:
-              const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           onTap: _onItemTapped,
         ));
   }

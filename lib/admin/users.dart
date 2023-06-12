@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,11 +13,18 @@ class Users extends StatefulWidget {
 }
 
 class _UsersState extends State<Users> {
+  List<dynamic> data = [];
   User? user;
   AuthController controller = Get.put(AuthController());
 
   GlobalKey<FormState> dialogKey = GlobalKey<FormState>();
   TextEditingController txtOTP = TextEditingController();
+
+  GlobalKey<FormState> editFormKey = GlobalKey<FormState>();
+  TextEditingController eNidControl = TextEditingController();
+  TextEditingController eNameControl = TextEditingController();
+  TextEditingController eAddressControl = TextEditingController();
+  TextEditingController ePhoneControl = TextEditingController();
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController nidControl = TextEditingController();
@@ -72,13 +80,13 @@ class _UsersState extends State<Users> {
                                 fontWeight: FontWeight.bold),
                             decoration: BoxDecoration(
                               border:
-                                  Border.all(color: Colors.blueGrey.shade300),
+                              Border.all(color: Colors.blueGrey.shade300),
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           showCursor: true,
                           pinputAutovalidateMode:
-                              PinputAutovalidateMode.onSubmit,
+                          PinputAutovalidateMode.onSubmit,
                         ),
                         const SizedBox(
                           height: 10,
@@ -150,32 +158,32 @@ class _UsersState extends State<Users> {
                         ),
                         inputWidget(
                             context, 'Name', Icons.account_box, nameControl,
-                            (String? input) {
-                          if (input!.isEmpty) {
-                            return 'Please enter user\'s name';
-                          }
-                          return null;
-                        }),
+                                (String? input) {
+                              if (input!.isEmpty) {
+                                return 'Please enter user\'s name';
+                              }
+                              return null;
+                            }),
                         const SizedBox(
                           height: 10,
                         ),
                         inputWidget(context, 'Address', Icons.account_box,
                             addressControl, (String? input) {
-                          if (input!.isEmpty) {
-                            return 'Please enter user\'s address';
-                          }
-                          return null;
-                        }),
+                              if (input!.isEmpty) {
+                                return 'Please enter user\'s address';
+                              }
+                              return null;
+                            }),
                         const SizedBox(
                           height: 10,
                         ),
                         inputWidget(context, 'NID', Icons.credit_card_rounded,
                             nidControl, (String? input) {
-                          if (input!.isEmpty) {
-                            return 'Please enter user\'s NID';
-                          }
-                          return null;
-                        }),
+                              if (input!.isEmpty) {
+                                return 'Please enter user\'s NID';
+                              }
+                              return null;
+                            }),
                         const SizedBox(
                           height: 10,
                         ),
@@ -208,6 +216,10 @@ class _UsersState extends State<Users> {
           );
         });
   }
+
+  Future<void> loadUsers() async {}
+
+  final userStream = FirebaseFirestore.instance.collection('users').snapshots();
 
   @override
   void initState() {
@@ -263,6 +275,172 @@ class _UsersState extends State<Users> {
               const SizedBox(
                 height: 15,
               ),
+              Container(
+                height: MediaQuery.of(context).size.height - 180,
+                child: StreamBuilder(
+                  stream: userStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Text('Loading...');
+                    } else {
+                      var docs = snapshot.data!.docs;
+                      return ListView.builder(
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            leading: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        docs[index]['pic']),
+                                    fit: BoxFit.fill)
+                              ),
+                            ),
+                            title: Text('${docs[index]['name']}'),
+                            subtitle: Text('${docs[index]['phone']}'),
+                            selectedTileColor: Colors.blueGrey.shade50,
+                            onTap: () {
+                              ePhoneControl.text='${docs[index]['phone']}';
+                              eNameControl.text='${docs[index]['name']}';
+                              eAddressControl.text='${docs[index]['address']}';
+                              eNidControl.text='${docs[index]['nid']}';
+                              showModalBottomSheet<void>(
+                                  context: context,
+                                  isDismissible: true,
+                                  isScrollControlled: true,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context).viewInsets.bottom),
+                                      child: Container(
+                                        height: MediaQuery.of(context).size.height * 0.5,
+                                        color: Colors.white30,
+                                        child: Container(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Form(
+                                              key: editFormKey,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Container(
+                                                      width: MediaQuery.of(context).size.width,
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            '${docs[index]['name']}',
+                                                            textAlign: TextAlign.start,
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            (docs[index]['role'] == 1) ? 'User' : (docs[index]['role'] == 2) ? 'Driver' : (docs[index]['role'] == 5) ? 'Admin' : 'Unknown',
+                                                            textAlign: TextAlign.end,
+                                                            style: const TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  inputWidget(
+                                                      context, 'Name', Icons.account_box, eNameControl,
+                                                          (String? input) {
+                                                        if (input!.isEmpty) {
+                                                          return 'Please enter user\'s name';
+                                                        }
+                                                        return null;
+                                                      }),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  inputWidget(
+                                                      context, 'Phone', Icons.phone, ePhoneControl,
+                                                          (String? input) {
+                                                        if (input!.isEmpty) {
+                                                          return 'Please enter user\'s phone';
+                                                        }
+                                                        return null;
+                                                      }),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  inputWidget(context, 'Address', Icons.location_on,
+                                                      eAddressControl, (String? input) {
+                                                        if (input!.isEmpty) {
+                                                          return 'Please enter user\'s address';
+                                                        }
+                                                        return null;
+                                                      }),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  inputWidget(context, 'NID', Icons.credit_card_rounded,
+                                                      eNidControl, (String? input) {
+                                                        if (input!.isEmpty) {
+                                                          return 'Please enter user\'s NID';
+                                                        }
+                                                        return null;
+                                                      }),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Container(
+                                                    width: MediaQuery.of(context).size.width,
+                                                    padding: const EdgeInsets.all(5),
+                                                    child: ElevatedButton(
+                                                      child: const Text(
+                                                        'Update User',
+                                                        style: TextStyle(
+                                                            fontSize: 16, fontWeight: FontWeight.bold),
+                                                      ),
+                                                      onPressed: () async {
+                                                        if (editFormKey.currentState!.validate()) {
+                                                          await FirebaseFirestore.instance.collection('users').doc('${docs[index]['uid']}').update(
+                                                              {
+                                                                'name': eNameControl.text.trim(),
+                                                                'phone': ePhoneControl.text.trim(),
+                                                                'address': eAddressControl.text.trim(),
+                                                                'nid': eNidControl.text.trim(),
+                                                              }
+                                                          ).then((value) =>
+                                                              Navigator.pop(context)
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )),
+                                      ),
+                                    );
+                                  });
+                            },
+                          );
+                        },
+                        itemCount: docs.length,
+                      );
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -306,17 +484,17 @@ class _UsersState extends State<Users> {
                                   validator: (val) => val!.isEmpty
                                       ? 'Please enter your phone number'
                                       : (val.length == 14)
-                                          ? null
-                                          : 'Please provide number with country code',
+                                      ? null
+                                      : 'Please provide number with country code',
                                   decoration: const InputDecoration(
                                       labelText: 'Phone',
                                       contentPadding: EdgeInsets.all(10),
                                       border: OutlineInputBorder(
                                           borderSide: BorderSide(
-                                        color: Colors.green,
-                                        width: 1,
-                                        style: BorderStyle.solid,
-                                      )))),
+                                            color: Colors.green,
+                                            width: 1,
+                                            style: BorderStyle.solid,
+                                          )))),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -357,17 +535,6 @@ class _UsersState extends State<Users> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.blueGrey,
-          ),
-        ),
-        const SizedBox(
-          height: 6,
-        ),
         Container(
           //width: MediaQuery.of(context).size.width,
           height: 50,
