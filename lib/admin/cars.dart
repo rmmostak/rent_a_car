@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rent_a_car/admin/add_car.dart';
 
 class Cars extends StatefulWidget {
   const Cars({Key? key}) : super(key: key);
@@ -10,9 +11,15 @@ class Cars extends StatefulWidget {
 class _CarsState extends State<Cars> {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController nidControl = TextEditingController();
-  TextEditingController nameControl = TextEditingController();
-  TextEditingController phoneControl = TextEditingController();
+  TextEditingController modelC = TextEditingController();
+  TextEditingController brandC = TextEditingController();
+  TextEditingController colorC = TextEditingController();
+  TextEditingController gearboxC = TextEditingController();
+  TextEditingController seatC = TextEditingController();
+  TextEditingController topSpeedC = TextEditingController();
+  TextEditingController speed0C = TextEditingController();
+  TextEditingController licenceC = TextEditingController();
+  TextEditingController imgC = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,82 +75,145 @@ class _CarsState extends State<Cars> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showModalBottomSheet<void>(
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AddCar()));
+          /*showModalBottomSheet<void>(
               context: context,
+              isDismissible: true,
+              isScrollControlled: true,
               builder: (BuildContext context) {
-                return Container(
-                  color: Colors.white30,
+                return Padding(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Container(
-                      padding: const EdgeInsets.all(20),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: const Text(
-                                'Add New Car',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                    color: Colors.white30,
+                    height: MediaQuery.of(context).size.height,
+                    child: Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: const Text(
+                                  'Add New Car',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            inputWidget(
-                                context, 'Name', Icons.account_box, nameControl,
-                                    (String? input) {
-                                  if (input!.isEmpty) {
-                                    return 'Please enter user\'s name';
-                                  }
-                                  return null;
-                                }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            inputWidget(
-                                context, 'Phone', Icons.phone, phoneControl,
-                                    (String? input) {
-                                  if (input!.isEmpty) {
-                                    return 'Please enter user\'s phone';
-                                  }
-                                  return null;
-                                }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            inputWidget(
-                                context, 'NID', Icons.credit_card_rounded,
-                                nidControl, (String? input) {
-                              if (input!.isEmpty) {
-                                return 'Please enter user\'s NID';
-                              }
-                              return null;
-                            }),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: ElevatedButton(
-                                child: const Text('Add New Car'),
-                                onPressed: () {
-                                  if (formKey.currentState!.validate()) {
-                                    print('some object');
-                                  }
-                                },
+                              const SizedBox(
+                                height: 10,
                               ),
-                            ),
-                          ],
-                        ),
-                      )
+                              inputWidget(
+                                  context, 'Licence', Icons.numbers, modelC,
+                                      (String? input) {
+                                    if (input!.isEmpty) {
+                                      return 'Please enter car\'s licence number';
+                                    }
+                                    return null;
+                                  }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Model', Icons.model_training, modelC,
+                                      (String? input) {
+                                    if (input!.isEmpty) {
+                                      return 'Please enter car\'s model';
+                                    }
+                                    return null;
+                                  }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Brand', Icons.star, brandC,
+                                      (String? input) {
+                                    if (input!.isEmpty) {
+                                      return 'Please enter car\'s brand';
+                                    }
+                                    return null;
+                                  }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Gearbox', Icons.roundabout_right,
+                                  colorC, (String? input) {
+                                if (input!.isEmpty) {
+                                  return 'Please enter car\'s gearbox';
+                                }
+                                return null;
+                              }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Color', Icons.color_lens_rounded,
+                                  colorC, (String? input) {
+                                if (input!.isEmpty) {
+                                  return 'Please enter car\'s color';
+                                }
+                                return null;
+                              }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Seat', Icons.event_seat,
+                                  colorC, (String? input) {
+                                if (input!.isEmpty) {
+                                  return 'Please enter car\'s seat';
+                                }
+                                return null;
+                              }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Top Speed', Icons.speed,
+                                  colorC, (String? input) {
+                                if (input!.isEmpty) {
+                                  return 'Please enter car\'s top speed';
+                                }
+                                return null;
+                              }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              inputWidget(
+                                  context, 'Speed (0-100)', Icons.shutter_speed,
+                                  colorC, (String? input) {
+                                if (input!.isEmpty) {
+                                  return 'Please enter car\'s speed time';
+                                }
+                                return null;
+                              }),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: ElevatedButton(
+                                  child: const Text('Add Car Photo'),
+                                  onPressed: () {
+                                    if (formKey.currentState!.validate()) {
+                                      print('some object');
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                    ),
                   ),
                 );
-              });
+              });*/
         },
         backgroundColor: Colors.blueGrey.shade900,
         child: const Icon(Icons.add),
