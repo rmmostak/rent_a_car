@@ -25,6 +25,10 @@ class _AddCarState extends State<AddCar> {
   TextEditingController imgC = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
+  final ImagePicker _picker1 = ImagePicker();
+  final ImagePicker _picker2 = ImagePicker();
+  final ImagePicker _picker3 = ImagePicker();
+  final ImagePicker _picker4 = ImagePicker();
   File? img1;
   File? img2;
   File? img3;
@@ -33,22 +37,22 @@ class _AddCarState extends State<AddCar> {
   getImage(ImageSource source, int img) async {
     XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() {
-        switch (img) {
-          case 1:
+      switch (img) {
+        case 1:
+          setState(() {
             img1 = File(image.path);
-            break;
-          case 2:
-            img2 = File(image.path);
-            break;
-          case 3:
-            img3 = File(image.path);
-            break;
-          case 4:
-            img4 = File(image.path);
-            break;
-        }
-      });
+          });
+          break;
+        case 2:
+          img2 = File(image.path);
+          break;
+        case 3:
+          img3 = File(image.path);
+          break;
+        case 4:
+          img4 = File(image.path);
+          break;
+      }
     }
   }
 
@@ -105,8 +109,6 @@ class _AddCarState extends State<AddCar> {
                 child: Form(
                   key: formKey,
                   child: Column(
-                    /*physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.vertical,*/
                     children: [
                       inputWidget(context, 'Licence No', Icons.numbers, modelC,
                           (String? input) {
@@ -194,8 +196,279 @@ class _AddCarState extends State<AddCar> {
                       ),
                       Container(
                         width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.centerLeft,
+                        child: const Text(
+                          'Front Side of Car',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          XFile? image = await _picker1.pickImage(
+                              source: ImageSource.gallery);
+                          if (image != null) {
+                            setState(() {
+                              img1 = File(image.path);
+                            });
+                          }
+                        },
+                        child: img1 == null
+                            ? Container(
+                                height: 90,
+                                width: MediaQuery.of(context).size.width,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1,
+                                      style: BorderStyle.solid,
+                                      color: Colors.blueGrey.shade100),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.05),
+                                      spreadRadius: 0,
+                                      blurRadius: 0,
+                                    )
+                                  ],
+                                  shape: BoxShape.rectangle,
+                                  color: Colors.blueGrey.shade50,
+                                ),
+                                child: const Icon(
+                                  Icons.directions_car_filled_rounded,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                              )
+                            : Container(
+                                height: 90,
+                                width: MediaQuery.of(context).size.width,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    boxShadow: const [
+                                      BoxShadow(
+                                          color: Colors.blueGrey,
+                                          spreadRadius: 1)
+                                    ],
+                                    shape: BoxShape.rectangle,
+                                    image: DecorationImage(
+                                      image: FileImage(img1!),
+                                      fit: BoxFit.fitWidth,
+                                    )),
+                              ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.centerLeft,
+                        child: const Text(
+                          'Back Side of Car',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          XFile? image = await _picker2.pickImage(
+                              source: ImageSource.gallery);
+                          if (image != null) {
+                            setState(() {
+                              img2 = File(image.path);
+                            });
+                          }
+                        },
+                        child: img2 == null
+                            ? Container(
+                          height: 90,
+                          width: MediaQuery.of(context).size.width,
+                          margin:
+                          const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 1,
+                                style: BorderStyle.solid,
+                                color: Colors.blueGrey.shade100),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.05),
+                                spreadRadius: 0,
+                                blurRadius: 0,
+                              )
+                            ],
+                            shape: BoxShape.rectangle,
+                            color: Colors.blueGrey.shade50,
+                          ),
+                          child: const Icon(
+                            Icons.directions_car_filled_rounded,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        )
+                            : Container(
+                          height: 90,
+                          width: MediaQuery.of(context).size.width,
+                          margin:
+                          const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Colors.blueGrey,
+                                    spreadRadius: 1)
+                              ],
+                              shape: BoxShape.rectangle,
+                              image: DecorationImage(
+                                image: FileImage(img2!),
+                                fit: BoxFit.fitWidth,
+                              )),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.centerLeft,
+                        child: const Text(
+                          'Left Side of Car',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          XFile? image = await _picker3.pickImage(
+                              source: ImageSource.gallery);
+                          if (image != null) {
+                            setState(() {
+                              img3 = File(image.path);
+                            });
+                          }
+                        },
+                        child: img3 == null
+                            ? Container(
+                          height: 90,
+                          width: MediaQuery.of(context).size.width,
+                          margin:
+                          const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 1,
+                                style: BorderStyle.solid,
+                                color: Colors.blueGrey.shade100),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.05),
+                                spreadRadius: 0,
+                                blurRadius: 0,
+                              )
+                            ],
+                            shape: BoxShape.rectangle,
+                            color: Colors.blueGrey.shade50,
+                          ),
+                          child: const Icon(
+                            Icons.directions_car_filled_rounded,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        )
+                            : Container(
+                          height: 90,
+                          width: MediaQuery.of(context).size.width,
+                          margin:
+                          const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Colors.blueGrey,
+                                    spreadRadius: 1)
+                              ],
+                              shape: BoxShape.rectangle,
+                              image: DecorationImage(
+                                image: FileImage(img3!),
+                                fit: BoxFit.fitWidth,
+                              )),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        alignment: Alignment.centerLeft,
+                        child: const Text(
+                          'Right Side of Car',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          XFile? image = await _picker4.pickImage(
+                              source: ImageSource.gallery);
+                          if (image != null) {
+                            setState(() {
+                              img4 = File(image.path);
+                            });
+                          }
+                        },
+                        child: img4 == null
+                            ? Container(
+                          height: 90,
+                          width: MediaQuery.of(context).size.width,
+                          margin:
+                          const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 1,
+                                style: BorderStyle.solid,
+                                color: Colors.blueGrey.shade100),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(0.05),
+                                spreadRadius: 0,
+                                blurRadius: 0,
+                              )
+                            ],
+                            shape: BoxShape.rectangle,
+                            color: Colors.blueGrey.shade50,
+                          ),
+                          child: const Icon(
+                            Icons.directions_car_filled_rounded,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        )
+                            : Container(
+                          height: 90,
+                          width: MediaQuery.of(context).size.width,
+                          margin:
+                          const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Colors.blueGrey,
+                                    spreadRadius: 1)
+                              ],
+                              shape: BoxShape.rectangle,
+                              image: DecorationImage(
+                                image: FileImage(img4!),
+                                fit: BoxFit.fitWidth,
+                              )),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
                         child: ElevatedButton(
-                          child: const Text('Add Car Photo'),
+                          child: const Text('Add Car'),
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
                               print('some object');
@@ -245,21 +518,26 @@ class _AddCarState extends State<AddCar> {
                                                   const Text(
                                                       'Front Side of Car'),
                                                   InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        getImage(
-                                                            ImageSource.gallery,
-                                                            1);
-                                                      });
+                                                    onTap: () async {
+                                                      XFile? image =
+                                                          await _picker.pickImage(
+                                                              source:
+                                                                  ImageSource
+                                                                      .gallery);
+                                                      if (image != null) {
+                                                        setState(() {
+                                                          img1 =
+                                                              File(image.path);
+                                                        });
+                                                      }
                                                     },
                                                     child: img1 == null
                                                         ? Container(
                                                             height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
+                                                            width: MediaQuery
+                                                                    .of(context)
+                                                                .size
+                                                                .width,
                                                             margin:
                                                                 const EdgeInsets
                                                                         .symmetric(
@@ -273,14 +551,16 @@ class _AddCarState extends State<AddCar> {
                                                                   .blueGrey
                                                                   .shade50,
                                                             ),
-                                                            child: const Icon(
+                                                            child: Text(
+                                                                'File path: ${img1?.path}')
+                                                            /*const Icon(
                                                               Icons
                                                                   .directions_car_filled_rounded,
                                                               color:
                                                                   Colors.white,
                                                               size: 40,
-                                                            ),
-                                                          )
+                                                            ),*/
+                                                            )
                                                         : Container(
                                                             height: 90,
                                                             width:

@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:rent_a_car/admin/add_car.dart';
+
+import '../controllers/AuthController.dart';
 
 class Cars extends StatefulWidget {
   const Cars({Key? key}) : super(key: key);
@@ -9,17 +13,11 @@ class Cars extends StatefulWidget {
 }
 
 class _CarsState extends State<Cars> {
-
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  TextEditingController modelC = TextEditingController();
-  TextEditingController brandC = TextEditingController();
-  TextEditingController colorC = TextEditingController();
-  TextEditingController gearboxC = TextEditingController();
-  TextEditingController seatC = TextEditingController();
-  TextEditingController topSpeedC = TextEditingController();
-  TextEditingController speed0C = TextEditingController();
-  TextEditingController licenceC = TextEditingController();
-  TextEditingController imgC = TextEditingController();
+  TextEditingController phoneC = TextEditingController();
+
+  AuthController controller = Get.put(AuthController());
+  String msg = '';
 
   @override
   Widget build(BuildContext context) {
@@ -75,18 +73,19 @@ class _CarsState extends State<Cars> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddCar()));
-          /*showModalBottomSheet<void>(
+          /*Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AddCar()));*/
+          showModalBottomSheet<void>(
               context: context,
               isDismissible: true,
               isScrollControlled: true,
               builder: (BuildContext context) {
                 return Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Container(
                     color: Colors.white30,
-                    height: MediaQuery.of(context).size.height,
+                    height: MediaQuery.of(context).size.height * 0.35,
                     child: Container(
                         padding: const EdgeInsets.all(20),
                         child: Form(
@@ -106,114 +105,115 @@ class _CarsState extends State<Cars> {
                                 ),
                               ),
                               const SizedBox(
-                                height: 10,
+                                height: 20,
                               ),
-                              inputWidget(
-                                  context, 'Licence', Icons.numbers, modelC,
-                                      (String? input) {
-                                    if (input!.isEmpty) {
-                                      return 'Please enter car\'s licence number';
-                                    }
-                                    return null;
-                                  }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Model', Icons.model_training, modelC,
-                                      (String? input) {
-                                    if (input!.isEmpty) {
-                                      return 'Please enter car\'s model';
-                                    }
-                                    return null;
-                                  }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Brand', Icons.star, brandC,
-                                      (String? input) {
-                                    if (input!.isEmpty) {
-                                      return 'Please enter car\'s brand';
-                                    }
-                                    return null;
-                                  }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Gearbox', Icons.roundabout_right,
-                                  colorC, (String? input) {
-                                if (input!.isEmpty) {
-                                  return 'Please enter car\'s gearbox';
-                                }
-                                return null;
-                              }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Color', Icons.color_lens_rounded,
-                                  colorC, (String? input) {
-                                if (input!.isEmpty) {
-                                  return 'Please enter car\'s color';
-                                }
-                                return null;
-                              }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Seat', Icons.event_seat,
-                                  colorC, (String? input) {
-                                if (input!.isEmpty) {
-                                  return 'Please enter car\'s seat';
-                                }
-                                return null;
-                              }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Top Speed', Icons.speed,
-                                  colorC, (String? input) {
-                                if (input!.isEmpty) {
-                                  return 'Please enter car\'s top speed';
-                                }
-                                return null;
-                              }),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              inputWidget(
-                                  context, 'Speed (0-100)', Icons.shutter_speed,
-                                  colorC, (String? input) {
-                                if (input!.isEmpty) {
-                                  return 'Please enter car\'s speed time';
-                                }
-                                return null;
-                              }),
+                              TextFormField(
+                                  keyboardType: TextInputType.phone,
+                                  controller: phoneC,
+                                  validator: (val) => val!.isEmpty
+                                      ? 'Please enter your phone number'
+                                      : (val.length == 14)
+                                          ? null
+                                          : 'Please provide number with country code',
+                                  decoration: const InputDecoration(
+                                      labelText: 'Driver\'s Phone No',
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                        color: Colors.green,
+                                        width: 1,
+                                        style: BorderStyle.solid,
+                                      )))),
                               const SizedBox(
                                 height: 10,
                               ),
                               Container(
                                 width: MediaQuery.of(context).size.width,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
                                 child: ElevatedButton(
-                                  child: const Text('Add Car Photo'),
-                                  onPressed: () {
+                                  child: const Text(
+                                    'Add Car Details',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  onPressed: () async {
                                     if (formKey.currentState!.validate()) {
-                                      print('some object');
+                                        final result = await FirebaseFirestore
+                                            .instance
+                                            .collection('users')
+                                            .where('phone',
+                                                isEqualTo: phoneC.text)
+                                            .get();
+
+                                        List searchList = result.docs
+                                            .map((e) => e.data())
+                                            .toList();
+                                        print(searchList);
+                                        if (searchList.isEmpty) {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: Row(
+                                                    children: const [
+                                                      Icon(
+                                                        Icons.warning_amber,
+                                                        color: Colors.red,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Text(
+                                                        'Alert',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ],
+                                                  ), //const Text('Alert'),
+                                                  content: const Text(
+                                                      'This driver is not registered yet or the phone number is wrong.'),
+                                                  actions: [
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(5),
+                                                          child: const Text(
+                                                            'Close',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          )),
+                                                    )
+                                                  ],
+                                                );
+                                              });
+                                        } else {
+                                          Navigator.push(context,
+                                              MaterialPageRoute(builder: (context) => AddCar()));
+                                        }
                                     }
                                   },
                                 ),
                               ),
+                              Text(
+                                msg,
+                                style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontSize: 14,
+                                ),
+                              )
                             ],
                           ),
-                        )
-                    ),
+                        )),
                   ),
                 );
-              });*/
+              });
         },
         backgroundColor: Colors.blueGrey.shade900,
         child: const Icon(Icons.add),
@@ -256,7 +256,8 @@ class _CarsState extends State<Cars> {
                 )
               ]),
           child: TextFormField(
-            textCapitalization: TextCapitalization.words,
+            keyboardType: TextInputType.phone,
+            initialValue: '+88',
             controller: controller,
             validator: (input) => validator(input),
             readOnly: readOnly,
