@@ -1,10 +1,16 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as Path;
+import 'package:rent_a_car/admin/cars.dart';
 
 class AddCar extends StatefulWidget {
-  const AddCar({Key? key}) : super(key: key);
+  final String uid;
+
+  const AddCar({Key? key, required this.uid}) : super(key: key);
 
   @override
   State<AddCar> createState() => _AddCarState();
@@ -34,26 +40,24 @@ class _AddCarState extends State<AddCar> {
   File? img3;
   File? img4;
 
-  getImage(ImageSource source, int img) async {
-    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      switch (img) {
-        case 1:
-          setState(() {
-            img1 = File(image.path);
-          });
-          break;
-        case 2:
-          img2 = File(image.path);
-          break;
-        case 3:
-          img3 = File(image.path);
-          break;
-        case 4:
-          img4 = File(image.path);
-          break;
-      }
-    }
+  @override
+  void initState() {
+    print('Phone: ${widget.uid}');
+    super.initState();
+  }
+
+  Future<String> uploadPic(File image, String id) async {
+    String imgUrl = '';
+    var fileName = Path.basename(image.path);
+    var reference =
+        FirebaseStorage.instance.ref().child('cars/$id/$fileName');
+    UploadTask task = reference.putFile(image);
+    TaskSnapshot snapshot = await task.whenComplete(() => null);
+    await snapshot.ref.getDownloadURL().then((value) => {
+          imgUrl = value,
+        });
+
+    return imgUrl;
   }
 
   @override
@@ -110,7 +114,8 @@ class _AddCarState extends State<AddCar> {
                   key: formKey,
                   child: Column(
                     children: [
-                      inputWidget(context, 'Licence No', Icons.numbers, modelC,
+                      inputWidget(
+                          context, 'Licence No', Icons.numbers, licenceC,
                           (String? input) {
                         if (input!.isEmpty) {
                           return 'Please enter car\'s licence number';
@@ -142,7 +147,7 @@ class _AddCarState extends State<AddCar> {
                         height: 10,
                       ),
                       inputWidget(
-                          context, 'Gearbox', Icons.roundabout_right, colorC,
+                          context, 'Gearbox', Icons.roundabout_right, gearboxC,
                           (String? input) {
                         if (input!.isEmpty) {
                           return 'Please enter car\'s gearbox';
@@ -163,7 +168,7 @@ class _AddCarState extends State<AddCar> {
                       const SizedBox(
                         height: 10,
                       ),
-                      inputWidget(context, 'Seat', Icons.event_seat, colorC,
+                      inputWidget(context, 'Seat', Icons.event_seat, seatC,
                           (String? input) {
                         if (input!.isEmpty) {
                           return 'Please enter car\'s seat';
@@ -173,7 +178,7 @@ class _AddCarState extends State<AddCar> {
                       const SizedBox(
                         height: 10,
                       ),
-                      inputWidget(context, 'Top Speed', Icons.speed, colorC,
+                      inputWidget(context, 'Top Speed', Icons.speed, topSpeedC,
                           (String? input) {
                         if (input!.isEmpty) {
                           return 'Please enter car\'s top speed';
@@ -184,8 +189,8 @@ class _AddCarState extends State<AddCar> {
                         height: 10,
                       ),
                       inputWidget(
-                          context, 'Speed (0-100)', Icons.shutter_speed, colorC,
-                          (String? input) {
+                          context, 'Speed (0-100)', Icons.shutter_speed,
+                          speed0C, (String? input) {
                         if (input!.isEmpty) {
                           return 'Please enter car\'s speed time';
                         }
@@ -469,367 +474,36 @@ class _AddCarState extends State<AddCar> {
                         width: MediaQuery.of(context).size.width,
                         child: ElevatedButton(
                           child: const Text('Add Car'),
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              print('some object');
-                            } else {
-                              showModalBottomSheet<void>(
-                                  context: context,
-                                  isDismissible: true,
-                                  isScrollControlled: true,
-                                  builder: (BuildContext context) {
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                          bottom: MediaQuery.of(context)
-                                              .viewInsets
-                                              .bottom),
-                                      child: Container(
-                                        color: Colors.white30,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.8,
-                                        child: Container(
-                                            padding: const EdgeInsets.all(20),
-                                            child: Form(
-                                              key: imgFormKey,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    child: const Text(
-                                                      'Add Car Image',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  const Text(
-                                                      'Front Side of Car'),
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      XFile? image =
-                                                          await _picker.pickImage(
-                                                              source:
-                                                                  ImageSource
-                                                                      .gallery);
-                                                      if (image != null) {
-                                                        setState(() {
-                                                          img1 =
-                                                              File(image.path);
-                                                        });
-                                                      }
-                                                    },
-                                                    child: img1 == null
-                                                        ? Container(
-                                                            height: 90,
-                                                            width: MediaQuery
-                                                                    .of(context)
-                                                                .size
-                                                                .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .rectangle,
-                                                              color: Colors
-                                                                  .blueGrey
-                                                                  .shade50,
-                                                            ),
-                                                            child: Text(
-                                                                'File path: ${img1?.path}')
-                                                            /*const Icon(
-                                                              Icons
-                                                                  .directions_car_filled_rounded,
-                                                              color:
-                                                                  Colors.white,
-                                                              size: 40,
-                                                            ),*/
-                                                            )
-                                                        : Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    boxShadow: const [
-                                                                  BoxShadow(
-                                                                      color: Colors
-                                                                          .blueGrey,
-                                                                      spreadRadius:
-                                                                          1)
-                                                                ],
-                                                                    shape: BoxShape
-                                                                        .rectangle,
-                                                                    image:
-                                                                        DecorationImage(
-                                                                      image: FileImage(
-                                                                          img1!),
-                                                                      fit: BoxFit
-                                                                          .fitWidth,
-                                                                    )),
-                                                          ),
-                                                  ),
-                                                  const Text(
-                                                      'Back Side of Car'),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        getImage(
-                                                            ImageSource.gallery,
-                                                            2);
-                                                      });
-                                                    },
-                                                    child: img2 == null
-                                                        ? Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .rectangle,
-                                                              color: Colors
-                                                                  .blueGrey
-                                                                  .shade50,
-                                                            ),
-                                                            child: const Icon(
-                                                              Icons
-                                                                  .directions_car_filled_rounded,
-                                                              color:
-                                                                  Colors.white,
-                                                              size: 40,
-                                                            ),
-                                                          )
-                                                        : Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    boxShadow: const [
-                                                                  BoxShadow(
-                                                                      color: Colors
-                                                                          .blueGrey,
-                                                                      spreadRadius:
-                                                                          1)
-                                                                ],
-                                                                    shape: BoxShape
-                                                                        .rectangle,
-                                                                    image:
-                                                                        DecorationImage(
-                                                                      image: FileImage(
-                                                                          img2!),
-                                                                      fit: BoxFit
-                                                                          .fitWidth,
-                                                                    )),
-                                                          ),
-                                                  ),
-                                                  const Text(
-                                                      'Left Side of Car'),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        getImage(
-                                                            ImageSource.gallery,
-                                                            3);
-                                                      });
-                                                    },
-                                                    child: img3 == null
-                                                        ? Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .rectangle,
-                                                              color: Colors
-                                                                  .blueGrey
-                                                                  .shade50,
-                                                            ),
-                                                            child: const Icon(
-                                                              Icons
-                                                                  .directions_car_filled_rounded,
-                                                              color:
-                                                                  Colors.white,
-                                                              size: 40,
-                                                            ),
-                                                          )
-                                                        : Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    boxShadow: const [
-                                                                  BoxShadow(
-                                                                      color: Colors
-                                                                          .blueGrey,
-                                                                      spreadRadius:
-                                                                          1)
-                                                                ],
-                                                                    shape: BoxShape
-                                                                        .rectangle,
-                                                                    image:
-                                                                        DecorationImage(
-                                                                      image: FileImage(
-                                                                          img3!),
-                                                                      fit: BoxFit
-                                                                          .fitWidth,
-                                                                    )),
-                                                          ),
-                                                  ),
-                                                  const Text(
-                                                      'Right Side of Car'),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        getImage(
-                                                            ImageSource.gallery,
-                                                            4);
-                                                      });
-                                                    },
-                                                    child: img4 == null
-                                                        ? Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .rectangle,
-                                                              color: Colors
-                                                                  .blueGrey
-                                                                  .shade50,
-                                                            ),
-                                                            child: const Icon(
-                                                              Icons
-                                                                  .directions_car_filled_rounded,
-                                                              color:
-                                                                  Colors.white,
-                                                              size: 40,
-                                                            ),
-                                                          )
-                                                        : Container(
-                                                            height: 90,
-                                                            width:
-                                                                MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                            margin:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    boxShadow: const [
-                                                                  BoxShadow(
-                                                                      color: Colors
-                                                                          .blueGrey,
-                                                                      spreadRadius:
-                                                                          1)
-                                                                ],
-                                                                    shape: BoxShape
-                                                                        .rectangle,
-                                                                    image:
-                                                                        DecorationImage(
-                                                                      image: FileImage(
-                                                                          img4!),
-                                                                      fit: BoxFit
-                                                                          .fitWidth,
-                                                                    )),
-                                                          ),
-                                                  ),
-                                                  Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .width,
-                                                    child: ElevatedButton(
-                                                      child: const Text(
-                                                          'Add Car Photo'),
-                                                      onPressed: () {
-                                                        if (imgFormKey
-                                                            .currentState!
-                                                            .validate()) {
-                                                          print(
-                                                              '${img1?.path.toString()}\n${img2?.path.toString()}\n${img3?.path.toString()}\n${img4?.path.toString()}');
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )),
-                                      ),
-                                    );
+                          onPressed: () async {
+                            if (formKey.currentState!.validate() &&
+                                img1?.path != null &&
+                                img2?.path != null &&
+                                img3?.path != null &&
+                                img4?.path != null) {
+                              FirebaseFirestore fireStore =
+                                  FirebaseFirestore.instance;
+                              var id = fireStore.collection('cars').doc().id;
+                              print('ID: $id \n${uploadPic(img1!, id)}');
+                              fireStore.collection('cars').doc(id).set({
+                                'id': id,
+                                'uid': widget.uid,
+                                'licence': licenceC.text,
+                                'model': modelC.text,
+                                'brand': brandC.text,
+                                'gearbox': gearboxC.text,
+                                'color': colorC.text,
+                                'seat': seatC.text,
+                                'topSpeed': topSpeedC.text,
+                                'speed0': speed0C.text,
+                                'front': await uploadPic(img1!, id),
+                                'back': await uploadPic(img2!, id),
+                                'left': await uploadPic(img3!, id),
+                                'right': await uploadPic(img4!, id),
+                              }).then((value) => {
+                                    Navigator.pop(context),
                                   });
+                            } else {
+                              print('some object clicked!');
                             }
                           },
                         ),
@@ -862,24 +536,7 @@ class _AddCarState extends State<AddCar> {
         const SizedBox(
           height: 6,
         ),
-        Container(
-          //width: MediaQuery.of(context).size.width,
-          height: 50,
-          decoration: BoxDecoration(
-              color: Colors.blueGrey.shade50,
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
-              border: Border.all(
-                  width: 1,
-                  style: BorderStyle.solid,
-                  color: Colors.blueGrey.shade100),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.05),
-                  spreadRadius: 0,
-                  blurRadius: 0,
-                )
-              ]),
-          child: TextFormField(
+        TextFormField(
             textCapitalization: TextCapitalization.words,
             controller: controller,
             validator: (input) => validator(input),
@@ -888,6 +545,7 @@ class _AddCarState extends State<AddCar> {
               fontSize: 18,
             ),
             decoration: InputDecoration(
+                contentPadding: const EdgeInsets.all(10),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 10, right: 10),
                   child: Icon(
@@ -895,9 +553,12 @@ class _AddCarState extends State<AddCar> {
                     color: Colors.blueGrey,
                   ),
                 ),
-                border: InputBorder.none),
-          ),
-        )
+                border: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                  color: Colors.green,
+                  width: 1,
+                  style: BorderStyle.solid,
+                )))),
       ],
     );
   }

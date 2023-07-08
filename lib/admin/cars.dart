@@ -150,7 +150,7 @@ class _CarsState extends State<Cars> {
                                         List searchList = result.docs
                                             .map((e) => e.data())
                                             .toList();
-                                        print(searchList);
+                                        print('$searchList \nUID: ${searchList[0]['uid']}');
                                         if (searchList.isEmpty) {
                                           showDialog(
                                               context: context,
@@ -195,7 +195,7 @@ class _CarsState extends State<Cars> {
                                               });
                                         } else {
                                           Navigator.push(context,
-                                              MaterialPageRoute(builder: (context) => AddCar()));
+                                              MaterialPageRoute(builder: (context) => AddCar(uid: searchList[0]['uid'],)));
                                         }
                                     }
                                   },
@@ -218,64 +218,6 @@ class _CarsState extends State<Cars> {
         backgroundColor: Colors.blueGrey.shade900,
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  Widget inputWidget(BuildContext context, String label, IconData iconData,
-      TextEditingController controller, Function validator,
-      {Function? onTap, bool readOnly = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.blueGrey,
-          ),
-        ),
-        const SizedBox(
-          height: 6,
-        ),
-        Container(
-          //width: MediaQuery.of(context).size.width,
-          height: 50,
-          decoration: BoxDecoration(
-              color: Colors.blueGrey.shade50,
-              borderRadius: const BorderRadius.all(Radius.circular(5)),
-              border: Border.all(
-                  width: 1,
-                  style: BorderStyle.solid,
-                  color: Colors.blueGrey.shade100),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.05),
-                  spreadRadius: 0,
-                  blurRadius: 0,
-                )
-              ]),
-          child: TextFormField(
-            keyboardType: TextInputType.phone,
-            initialValue: '+88',
-            controller: controller,
-            validator: (input) => validator(input),
-            readOnly: readOnly,
-            style: const TextStyle(
-              fontSize: 18,
-            ),
-            decoration: InputDecoration(
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: Icon(
-                    iconData,
-                    color: Colors.blueGrey,
-                  ),
-                ),
-                border: InputBorder.none),
-          ),
-        )
-      ],
     );
   }
 }
